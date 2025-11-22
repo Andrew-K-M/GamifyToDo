@@ -19,33 +19,50 @@ struct ContentView: View {
     }
     
     var body: some View {
-        List($reminders){ $reminder in
-            HStack {
-                Image(systemName: reminder.isCompleted
-                      ? "largecircle.fill.circle"
-                      : "circle")
-                    .imageScale(.large)
-                    .foregroundColor(.accentColor)
-                    .onTapGesture {
-                        reminder.isCompleted.toggle()
+        VStack{
+            TabView{
+                VStack{
+                    List($reminders){ $reminder in
+                        HStack {
+                            Image(systemName: reminder.isCompleted
+                                  ? "largecircle.fill.circle"
+                                  : "circle")
+                                .imageScale(.large)
+                                .foregroundColor(.accentColor)
+                                .onTapGesture {
+                                    reminder.isCompleted.toggle()
+                                }
+                            Text(reminder.title)
+                        }
                     }
-                Text(reminder.title)
-            }
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .bottomBar){
-                Button(action: presentAddReminderView){
-                    HStack{
-                        Image(systemName: "plus.cicrle.fill")
-                        Text("New Reminder")
+                    .toolbar {
+                        ToolbarItemGroup(placement: .bottomBar){
+                            Spacer()
+                            Button(action: presentAddReminderView){
+                                HStack{
+                                    Image(systemName: "plus")
+                                }
+                            }
+                            
+                        }
+                    }
+                    .sheet(isPresented: $isAddReminderDialogPresented) {
+                        ReminderView { reminder in
+                            reminders.append(reminder)
+                        }
                     }
                 }
-                Spacer()
-            }
-        }
-        .sheet(isPresented: $isAddReminderDialogPresented) {
-            ReminderView { reminder in
-                reminders.append(reminder)
+                .tabItem{
+                    Image(systemName: "house.fill")
+                    Text("List")
+                }
+                VStack{
+                    Text("User Profile")
+                }
+                .tabItem{
+                    Image(systemName: "person.crop.circle")
+                    Text("User")
+                }
             }
         }
     }
