@@ -12,19 +12,16 @@ struct ReminderView: View {
         case title
     }
     
-    @FocusState
-    private var focusedField: FucusableField?
+    @FocusState private var focusedField: FucusableField?
+    @State private var title = ""
+    //@State private var reminder = Reminder(title: "")
     
-    @State
-    private var reminder = Reminder(title: "")
+    @Environment(\.dismiss) private var dismiss
     
-    @Environment(\.dismiss)
-    private var dismiss
-    
-    var onCommit: (_ reminder: Reminder) -> Void
+    var onCommit: (_ title: String) -> Void
     
     private func commit() {
-        onCommit(reminder)
+        onCommit(title)
         dismiss()
      }
     
@@ -35,7 +32,7 @@ struct ReminderView: View {
     var body: some View {
         NavigationStack {
             Form{
-                TextField("Title",text: $reminder.title)
+                TextField("Title",text: $title)
                     .focused($focusedField, equals: .title)
             }
             .toolbar{
@@ -48,7 +45,7 @@ struct ReminderView: View {
                     Button(action: commit) {
                         Text("Add")
                     }
-                    .disabled(reminder.title.isEmpty)
+                    .disabled(title.isEmpty)
                 }
             }
             .onAppear{
@@ -59,7 +56,7 @@ struct ReminderView: View {
 }
 
 #Preview {
-    ReminderView { reminder in
-        print("You added a new reminder titled \(reminder.title)")
+    ReminderView { title in
+        print("You added a new reminder titled \(title)")
     }
 }
