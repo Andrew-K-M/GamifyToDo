@@ -70,6 +70,8 @@ struct ReminderRow: View {
             .foregroundColor(.accentColor)
         }.buttonStyle(.plain)
         Text(reminder.title ?? "No Title")
+        Text(reminder.dueBy ?? Date(), format: .dateTime.day().month().year())
+        
       }
     }
 }
@@ -107,9 +109,9 @@ struct ContentView: View {
                       }
                   }
                   .sheet(isPresented: $isAddReminderDialogPresented) {
-                      ReminderView { title in
+                      ReminderView { title,date,priority in
                           guard !title.isEmpty else { return }
-                          addReminder(title: title)
+                          addReminder(title: title,dueBy: date, priority: priority)
                           isAddReminderDialogPresented = false
                       }
                   }
@@ -137,11 +139,13 @@ struct ContentView: View {
   }
     
   // Core Data Functions
-  private func addReminder(title: String){
+    private func addReminder(title: String, dueBy: Date, priority: String){
     let newReminder = Reminder(context: self.viewContext)
     newReminder.title = title
     newReminder.createdAt = Date()
     newReminder.isCompleted = false
+    newReminder.dueBy = dueBy
+    newReminder.priority = priority
     saveContext()
   }
     

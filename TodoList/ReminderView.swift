@@ -14,14 +14,17 @@ struct ReminderView: View {
     
     @FocusState private var focusedField: FucusableField?
     @State private var title = ""
+    @State private var dueBy = Date()
+    @State private var priority: String = "Neutral"
     //@State private var reminder = Reminder(title: "")
     
     @Environment(\.dismiss) private var dismiss
     
-    var onCommit: (_ title: String) -> Void
+    let options = ["High", "Neutral", "Low"]
+    var onCommit: (_ title: String, _ dueBy: Date, _ priority: String) -> Void
     
     private func commit() {
-        onCommit(title)
+        onCommit(title,dueBy,priority)
         dismiss()
      }
     
@@ -32,8 +35,14 @@ struct ReminderView: View {
     var body: some View {
         NavigationStack {
             Form{
-                TextField("Title",text: $title)
-                    .focused($focusedField, equals: .title)
+                TextField("Title",text: $title).focused($focusedField, equals: .title)
+                DatePicker("Due Date", selection: $dueBy)
+                Picker("Select an option", selection: $priority) {
+                    ForEach(options, id: \.self) { option in
+                        Text(option).tag(option)
+                    }
+                }
+                .pickerStyle(.menu) // This makes it behave like a dropdown
             }
             .toolbar{
                 ToolbarItem(placement: .cancellationAction){
@@ -56,7 +65,7 @@ struct ReminderView: View {
 }
 
 #Preview {
-    ReminderView { title in
-        print("You added a new reminder titled \(title)")
+    ReminderView { title,date,priority in
+        print("Added reminder: \(title), \(date), due: \(priority)")
     }
 }
