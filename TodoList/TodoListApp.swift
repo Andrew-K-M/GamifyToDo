@@ -26,11 +26,12 @@ class PersistenceController {
 @main
 struct TodoListApp: App {
     let persistenceController = PersistenceController.shared
-
+    @State private var loggedInUser: User? = nil
+    
   var body: some Scene {
     WindowGroup {
-      ContentView()
-        .environment(\.managedObjectContext, persistenceController.container.viewContext)
+        ContentView()
+          .environment(\.managedObjectContext, persistenceController.container.viewContext)
     }
   }
 }
