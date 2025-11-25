@@ -13,16 +13,22 @@ struct UserProfile: View {
   @Environment(\.managedObjectContext) var viewContext
   
   var body: some View {
-    VStack{
-      Text("User Profile")
-      Text("Name: \(user.name ?? "unknown")")
-      Text("Level: \(user.level)")
-      Text("XP: \(user.xp)")
-      Text("Tasks Completed: \(user.tasksCompleted)")
-      Text("Created: \(user.createdAt?.formatted(date:.abbreviated,time:.shortened) ?? "")")
+    Form {
+      Section(header: Text("Profile")) {
+        HStack {
+          Spacer()
+          Image(systemName: "person.crop.circle").resizable().scaledToFit().frame(width: 120, height: 120)
+          Spacer()
+        }
+        Label("Name: \(user.name ?? "Unknown")", systemImage: "person")
+        Label("Level: \(user.level)", systemImage: "star.fill")
+        Label("XP: \(user.xp)", systemImage: "bolt.fill")
+        Label("Completed: \(user.tasksCompleted)", systemImage: "checkmark.circle")
+        Label("Created: \(user.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "")", systemImage: "calendar")
+      }
     }
-      
   }
+      
   private func checkLevelUp(){
     if user.xp >= 100{
       user.level += 1
