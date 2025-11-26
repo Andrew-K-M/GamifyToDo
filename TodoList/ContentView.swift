@@ -86,48 +86,49 @@ struct ContentView: View {
   @State private var isAddReminderDialogPresented = false
     
   var body: some View {
-    let user = currentUser.first!
       VStack{
           TabView{
-              // List Tab
-              VStack{
-                  List{
-                      ForEach(reminders){ reminder in
-                          ReminderRow(reminder: reminder)
-                      }
-                      .onDelete(perform: deleteReminders)
-                  }
-                  .toolbar {
-                      ToolbarItemGroup(placement: .bottomBar){
-                          Spacer()
-                          Button {
-                              isAddReminderDialogPresented.toggle()
-                          } label: {
-                              Image(systemName: "plus")
+              if let user = currentUser.first{
+                  // List Tab
+                  VStack{
+                      List{
+                          ForEach(reminders){ reminder in
+                              ReminderRow(reminder: reminder)
                           }
-                            
+                          .onDelete(perform: deleteReminders)
+                      }
+                      .toolbar {
+                          ToolbarItemGroup(placement: .bottomBar){
+                              Spacer()
+                              Button {
+                                  isAddReminderDialogPresented.toggle()
+                              } label: {
+                                  Image(systemName: "plus")
+                              }
+                                
+                          }
+                      }
+                      .sheet(isPresented: $isAddReminderDialogPresented) {
+                          ReminderView { title,date,priority in
+                              guard !title.isEmpty else { return }
+                              addReminder(title: title,dueBy: date, priority: priority)
+                              isAddReminderDialogPresented = false
+                          }
                       }
                   }
-                  .sheet(isPresented: $isAddReminderDialogPresented) {
-                      ReminderView { title,date,priority in
-                          guard !title.isEmpty else { return }
-                          addReminder(title: title,dueBy: date, priority: priority)
-                          isAddReminderDialogPresented = false
-                      }
+                  .tabItem{
+                    Image(systemName: "house.fill")
+                    Text("List")
                   }
-              }
-              .tabItem{
-                Image(systemName: "house.fill")
-                Text("List")
-              }
-              
-              // USer Tab
-              VStack{
-                UserProfile(user: user)
-              }
-              .tabItem{
-                  Image(systemName: "person.crop.circle")
-                  Text("User")
+                  
+                  // USer Tab
+                  VStack{
+                    UserProfile(user: user)
+                  }
+                  .tabItem{
+                      Image(systemName: "person.crop.circle")
+                      Text("User")
+                  }
               }
           }
           .onAppear {
