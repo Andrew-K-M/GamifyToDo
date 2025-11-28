@@ -15,7 +15,7 @@ class PersistenceController {
   static let shared = PersistenceController()
 
   private init() {
-    container.loadPersistentStores { description, error in
+    container.loadPersistentStores { _, error in
       if let error = error {
         print("Core Data failed to load: \(error.localizedDescription)")
       }
@@ -26,8 +26,8 @@ class PersistenceController {
 @main
 struct TodoListApp: App {
     let persistenceController = PersistenceController.shared
-    @State private var loggedInUser: User? = nil
-    
+    @State private var loggedInUser: User?
+
   var body: some Scene {
     WindowGroup {
         ContentView()

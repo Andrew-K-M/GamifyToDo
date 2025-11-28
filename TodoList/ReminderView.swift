@@ -8,34 +8,34 @@
 import SwiftUI
 
 struct ReminderView: View {
-    enum FucusableField: Hashable{
+    enum FucusableField: Hashable {
         case title
     }
-    
+
     @FocusState private var focusedField: FucusableField?
     @State private var title = ""
     @State private var dueBy = Date()
     @State private var priority: String = "Neutral"
-    //@State private var reminder = Reminder(title: "")
-    
+    // @State private var reminder = Reminder(title: "")
+
     @Environment(\.dismiss) private var dismiss
-    
+
     let options = ["High", "Neutral", "Low"]
     var onCommit: (_ title: String, _ dueBy: Date, _ priority: String) -> Void
-    
+
     private func commit() {
-        onCommit(title,dueBy,priority)
+        onCommit(title, dueBy, priority)
         dismiss()
      }
-    
-    private func cancel(){
+
+    private func cancel() {
         dismiss()
     }
-    
+
     var body: some View {
         NavigationStack {
-            Form{
-                TextField("Title",text: $title).focused($focusedField, equals: .title)
+            Form {
+                TextField("Title", text: $title).focused($focusedField, equals: .title)
                 DatePicker("Due Date", selection: $dueBy)
                 Picker("Select an option", selection: $priority) {
                     ForEach(options, id: \.self) { option in
@@ -44,20 +44,20 @@ struct ReminderView: View {
                 }
                 .pickerStyle(.menu) // This makes it behave like a dropdown
             }
-            .toolbar{
-                ToolbarItem(placement: .cancellationAction){
-                    Button(action: cancel){
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(action: cancel) {
                         Text("Cancel")
                     }
                 }
-                ToolbarItem(placement: .confirmationAction){
+                ToolbarItem(placement: .confirmationAction) {
                     Button(action: commit) {
                         Text("Add")
                     }
                     .disabled(title.isEmpty)
                 }
             }
-            .onAppear{
+            .onAppear {
                 focusedField = .title
             }
         }
@@ -65,7 +65,7 @@ struct ReminderView: View {
 }
 
 #Preview {
-    ReminderView { title,date,priority in
+    ReminderView { title, date, priority in
         print("Added reminder: \(title), \(date), due: \(priority)")
     }
 }
