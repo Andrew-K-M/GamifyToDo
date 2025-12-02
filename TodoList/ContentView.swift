@@ -83,9 +83,11 @@ struct ReminderRow: View {
             }
 
         Text(reminder.title ?? "No Title")
+              .strikethrough(reminder.isCompleted)
+              .foregroundStyle(reminder.isCompleted ? .secondary : .primary)
         Spacer()
         Text(reminder.dueBy ?? Date(), format: .dateTime.day().month().year())
-              .font(Font.caption.bold())
+              .font(Font.caption)
 
       }
     }
