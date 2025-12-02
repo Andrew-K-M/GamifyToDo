@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct ReminderView: View {
-    enum FucusableField: Hashable {
+    enum FocusableField: Hashable {
         case title
     }
 
-    @FocusState private var focusedField: FucusableField?
+    @FocusState private var focusedField: FocusableField?
     @State private var title = ""
     @State private var dueBy = Date()
     @State private var priority: String = "Neutral"

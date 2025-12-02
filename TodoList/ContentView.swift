@@ -83,7 +83,9 @@ struct ReminderRow: View {
             }
 
         Text(reminder.title ?? "No Title")
+        Spacer()
         Text(reminder.dueBy ?? Date(), format: .dateTime.day().month().year())
+              .font(Font.caption.bold())
 
       }
     }
@@ -91,8 +93,10 @@ struct ReminderRow: View {
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(entity: Reminder.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Reminder.title, ascending: true)], animation: .default) var reminders: FetchedResults<Reminder>
-    @FetchRequest(entity: User.entity(), sortDescriptors: [], animation: .default) var currentUser: FetchedResults<User>
+    @FetchRequest(entity: Reminder.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Reminder.title, ascending: true)], animation: .default)
+    var reminders: FetchedResults<Reminder>
+    @FetchRequest(entity: User.entity(), sortDescriptors: [], animation: .default)
+    var currentUser: FetchedResults<User>
     @State private var isAddReminderDialogPresented = false
     var activeTaskCount: Int {reminders.filter { !$0.isCompleted }.count}
     var maxTasks: Int = 10
@@ -136,6 +140,15 @@ struct ContentView: View {
                   .tabItem {
                     Image(systemName: "house.fill")
                     Text("List")
+                  }
+                  
+                  // Calendar tab
+                  VStack {
+                     CalendarView()
+                  }
+                  .tabItem {
+                      Image(systemName: "calendar")
+                      Text("Calendar")
                   }
 
                   // USer Tab
