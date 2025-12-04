@@ -209,7 +209,7 @@ struct TaskListView: View {
                     VStack(spacing: 8) {
                         ForEach(tasks) { task in
                             HStack {
-                                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                                Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "exclamationmark.circle")
                                     .foregroundColor(task.isCompleted ? .green : .gray)
                                 
                                 Text(task.title!)

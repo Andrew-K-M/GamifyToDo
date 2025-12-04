@@ -21,6 +21,16 @@ struct ReminderRow: View {
 
     var body: some View {
       let user = currentUser.first!
+        let priorityColor = switch reminder.priority {
+            case "High":
+                Color.red
+            case "Medium":
+                Color.orange
+            case "Low":
+                Color.blue
+            default:
+                Color.blue
+        }
       HStack {
         Button {
             if reminder.isCompleted {
@@ -46,22 +56,24 @@ struct ReminderRow: View {
                 print("ERROR")
             }
         } label: {
-          Image(systemName: reminder.isCompleted ? "largecircle.fill.circle" : "circle")
+            Image(systemName: reminder.isCompleted ?
+                  "checkmark.circle.fill" : "exclamationmark.circle")
             .imageScale(.large)
-            .foregroundColor(.accentColor)
+            .foregroundStyle(reminder.isCompleted ? .gray : priorityColor)
         }.buttonStyle(.plain)
             .alert("Task limit reached!", isPresented: $showAlert) {
                 Button("OK", role: .cancel) {}
             }
 
         Text(reminder.title ?? "No Title")
-              .strikethrough(reminder.isCompleted)
-              .foregroundStyle(reminder.isCompleted ? .secondary : .primary)
         Spacer()
         Text(reminder.dueBy ?? Date(), format: .dateTime.day().month().year())
               .font(Font.caption)
+          Image(systemName: "calendar")
 
       }
+      .foregroundStyle(reminder.isCompleted ? .secondary : .primary)
+      .strikethrough(reminder.isCompleted)
     }
 }
 
@@ -105,6 +117,12 @@ struct ContentView: View {
                                           .opacity(0.5)
                                   }
                               }
+                              ToolbarItem(placement: .topBarLeading) {
+                                  Button {
+                                  } label: {
+                                      Image(systemName: "line.3.horizontal.decrease")
+                                  }
+                              }
                           }
                           .navigationTitle("Tasks")
                           .sheet(isPresented: $isAddReminderDialogPresented) {
@@ -128,6 +146,14 @@ struct ContentView: View {
                           Image(systemName: "calendar")
                           Text("Calendar")
                       }
+                  
+                      // daily challenges
+                      VStack {
+                          ChallengeView()
+                      }.tabItem {
+                          Image(systemName: "text.justify")
+                          Text("Challenges")
+                      }
                       
                       // USer Tab
                       VStack {
@@ -136,14 +162,6 @@ struct ContentView: View {
                       .tabItem {
                           Image(systemName: "person.crop.circle")
                           Text("User")
-                      }
-                      
-                      // daily calenges
-                      VStack {
-                          ChallengeView()
-                      }.tabItem {
-                          Image(systemName: "text.justify")
-                          Text("Challenges")
                       }
               }
           }
