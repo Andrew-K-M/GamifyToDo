@@ -130,7 +130,7 @@ struct ChallengeView: View {
             let relevantTasks: Int
             switch challenge.type {
             case "daily":
-                if challenge.title == "Finish 1 medium task"{
+                if challenge.title == "Finish 2 medium task"{
                     relevantTasks = reminders.filter{
                         $0.isCompleted && $0.priority == "Medium" && ($0.completedAt ?? Date()) >= today
                     }.count
