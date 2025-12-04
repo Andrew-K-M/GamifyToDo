@@ -26,6 +26,8 @@ struct ProfileView: View {
                 Label("Completed: \(user.tasksCompleted)", systemImage: "checkmark.circle")
                 Label("Created: \(user.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "")", systemImage: "calendar")
             }
+        }.onAppear{
+            checkLevelUp()
         }
     }
 
