@@ -71,6 +71,7 @@ struct ChallengeView: View {
             
         }
         .onAppear {
+            deleteExpiredChallenges()
             generateChallengesIfNeeded()
             updateChallengeProgress()
         }
@@ -169,7 +170,7 @@ struct ChallengeView: View {
     }
     
     //MARK: Update when past endDate
-    private func updateChallengesDate(){
+    private func deleteExpiredChallenges(){
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date()))!
@@ -179,17 +180,11 @@ struct ChallengeView: View {
             switch challenge.type{
             case "daily":
                 if let endDate = challenge.endDate, endDate < today{
-                    challenge.isCompleted = false
-                    challenge.endDate = calendar.date(byAdding: .day, value: 1, to: today)!
-                    challenge.currentProgress = 0
-                    challenge.startDate = today
+                    viewContext.delete(challenge)
                 }
             case "weekly":
                 if let endDate = challenge.endDate, endDate < weekStart{
-                    challenge.isCompleted = false
-                    challenge.endDate = calendar.date(byAdding: .day, value: 7, to: weekStart)!
-                    challenge.currentProgress = 0
-                    challenge.startDate = weekStart
+                    viewContext.delete(challenge)
                 }
             default:
                 break
