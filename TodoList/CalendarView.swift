@@ -171,7 +171,7 @@ struct DayCell: View {
                 HStack(spacing: 2) {
                     ForEach(0..<min(taskCount, 3), id: \.self) { _ in
                         Circle()
-                            .fill(hasCompletedTasks ? Color.green : Color.orange)
+                            .fill(hasCompletedTasks ? Color.gray : Color.orange)
                             .frame(width: 4, height: 4)
                     }
                 }
@@ -208,9 +208,17 @@ struct TaskListView: View {
                 ScrollView {
                     VStack(spacing: 8) {
                         ForEach(tasks) { task in
+                            let priorityColor = switch task.priority {
+                            case "High":
+                                Color.red
+                            case "Medium":
+                                    Color.yellow
+                            default:
+                                    Color.blue
+                            }
                             HStack {
                                 Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "exclamationmark.circle")
-                                    .foregroundColor(task.isCompleted ? .green : .gray)
+                                    .foregroundColor(task.isCompleted ? .gray : priorityColor)
                                 
                                 Text(task.title!)
                                     .strikethrough(task.isCompleted)
