@@ -15,12 +15,12 @@ struct ReminderView: View {
     @FocusState private var focusedField: FocusableField?
     @State private var title = ""
     @State private var dueBy = Date()
-    @State private var priority: String = "Neutral"
+    @State private var priority: String = "Medium"
     // @State private var reminder = Reminder(title: "")
 
     @Environment(\.dismiss) private var dismiss
 
-    let options = ["High", "Neutral", "Low"]
+    let options = ["High", "Medium", "Low"]
     var onCommit: (_ title: String, _ dueBy: Date, _ priority: String) -> Void
 
     private func commit() {

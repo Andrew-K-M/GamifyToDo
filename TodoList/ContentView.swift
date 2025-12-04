@@ -12,6 +12,7 @@ import CoreData
 
 struct ReminderRow: View {
     @FetchRequest(entity: User.entity(), sortDescriptors: [], animation: .default) var currentUser: FetchedResults<User>
+    @FetchRequest(entity: Challenge.entity(),sortDescriptors: [NSSortDescriptor(keyPath: \Challenge.startDate, ascending: true)]) var challenges: FetchedResults<Challenge>
     @Environment(\.managedObjectContext) var viewContext
     @ObservedObject var reminder: Reminder
     var activeTaskCount: Int
@@ -30,13 +31,15 @@ struct ReminderRow: View {
                     reminder.isCompleted.toggle()
                     user.xp = max(0,user.xp - 5)
                     user.tasksCompleted = max(0, user.tasksCompleted - 1)
+                    
                 }
             } else { // complete task
                 reminder.isCompleted.toggle()
+                reminder.completedAt = Date()
                 user.tasksCompleted += 1
                 user.xp += 5
             }
-
+            
             do {
                 try viewContext.save()
             } catch {
@@ -150,14 +153,14 @@ struct ContentView: View {
 
   // Core Data Functions
     private func addReminder(title: String, dueBy: Date, priority: String) {
-    let newReminder = Reminder(context: self.viewContext)
-    newReminder.title = title
-    newReminder.createdAt = Date()
-    newReminder.isCompleted = false
-    newReminder.dueBy = dueBy
-    newReminder.priority = priority
-    saveContext()
-  }
+        let newReminder = Reminder(context: self.viewContext)
+        newReminder.title = title
+        newReminder.createdAt = Date()
+        newReminder.isCompleted = false
+        newReminder.dueBy = dueBy
+        newReminder.priority = priority
+        saveContext()
+    }
 
   private func deleteReminders(at offsets: IndexSet) {
     offsets.map { reminders[$0]}.forEach(viewContext.delete)
