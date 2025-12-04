@@ -79,68 +79,72 @@ struct ContentView: View {
       VStack {
           TabView {
               if let user = currentUser.first {
-                  // List Tab
-                  VStack {
-                      List {
-                          ForEach(reminders) { reminder in
-                              ReminderRow(reminder: reminder, activeTaskCount: activeTaskCount)
+                      // List Tab
+                      NavigationStack {
+                          List {
+                              ForEach(reminders) { reminder in
+                                  ReminderRow(reminder: reminder, activeTaskCount: activeTaskCount)
+                              }
+                              .onDelete(perform: deleteReminders)
                           }
-                          .onDelete(perform: deleteReminders)
-                      }
-                      .toolbar {
-                          ToolbarItemGroup(placement: .bottomBar) {
-                              Spacer()
-                              if activeTaskCount < maxTasks {
-                                  Button {
-                                      isAddReminderDialogPresented.toggle()
-                                  } label: {
+                          .toolbar {
+                              ToolbarItem(placement: .principal) {
+                                  Text("Achievr")
+                                      .font(Font.largeTitle.bold())
+                              }
+                              ToolbarItem(placement: .primaryAction) {
+                                  if activeTaskCount < maxTasks {
+                                      Button {
+                                          isAddReminderDialogPresented.toggle()
+                                      } label: {
+                                          Image(systemName: "plus")
+                                      }
+                                  } else {
                                       Image(systemName: "plus")
+                                          .foregroundColor(.gray)
+                                          .opacity(0.5)
                                   }
-                              } else {
-                                  Image(systemName: "plus")
-                                      .foregroundColor(.gray)
-                                      .opacity(0.5)
+                              }
+                          }
+                          .navigationTitle("Tasks")
+                          .sheet(isPresented: $isAddReminderDialogPresented) {
+                              ReminderView { title, date, priority in
+                                  guard !title.isEmpty else { return }
+                                  addReminder(title: title, dueBy: date, priority: priority)
+                                  isAddReminderDialogPresented = false
                               }
                           }
                       }
-                      .sheet(isPresented: $isAddReminderDialogPresented) {
-                          ReminderView { title, date, priority in
-                              guard !title.isEmpty else { return }
-                              addReminder(title: title, dueBy: date, priority: priority)
-                              isAddReminderDialogPresented = false
-                          }
+                      .tabItem {
+                          Image(systemName: "house.fill")
+                          Text("List")
                       }
-                  }
-                  .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("List")
-                  }
-                  
-                  // Calendar tab
-                  VStack {
-                     CalendarView()
-                  }
-                  .tabItem {
-                      Image(systemName: "calendar")
-                      Text("Calendar")
-                  }
-
-                  // USer Tab
-                  VStack {
-                    ProfileView(user: user)
-                  }
-                  .tabItem {
-                      Image(systemName: "person.crop.circle")
-                      Text("User")
-                  }
-
-                  // daily calenges
-                  VStack {
-                      ChallengeView()
-                  }.tabItem {
-                      Image(systemName: "text.justify")
-                      Text("Challenges")
-                  }
+                      
+                      // Calendar tab
+                      VStack {
+                          CalendarView()
+                      }
+                      .tabItem {
+                          Image(systemName: "calendar")
+                          Text("Calendar")
+                      }
+                      
+                      // USer Tab
+                      VStack {
+                          ProfileView(user: user)
+                      }
+                      .tabItem {
+                          Image(systemName: "person.crop.circle")
+                          Text("User")
+                      }
+                      
+                      // daily calenges
+                      VStack {
+                          ChallengeView()
+                      }.tabItem {
+                          Image(systemName: "text.justify")
+                          Text("Challenges")
+                      }
               }
           }
           .onAppear {
