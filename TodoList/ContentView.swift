@@ -8,39 +8,7 @@
 import SwiftUI
 import CoreData
 
-struct UserProfile: View {
-    @ObservedObject var user: User
-    @Environment(\.managedObjectContext) var viewContext
 
-    var body: some View {
-        Form {
-            Section(header: Text("Profile")) {
-                HStack {
-                    Spacer()
-                    Image(systemName: "person.crop.circle").resizable().scaledToFit().frame(width: 120, height: 120)
-                    Spacer()
-                }
-                Label("Name: \(user.name ?? "Unknown")", systemImage: "person")
-                Label("Level: \(user.level)", systemImage: "star.fill")
-                Label("XP: \(user.xp)", systemImage: "bolt.fill")
-                Label("Completed: \(user.tasksCompleted)", systemImage: "checkmark.circle")
-                Label("Created: \(user.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "")", systemImage: "calendar")
-            }
-        }
-    }
-
-    private func checkLevelUp() {
-        if user.xp >= 100 {
-            user.level += 1
-            user.xp -= 100
-        }
-        do {
-            try viewContext.save()
-        } catch {
-            print("Error saving user level")
-        }
-    }
-}
 
 struct ReminderRow: View {
     @FetchRequest(entity: User.entity(), sortDescriptors: [], animation: .default) var currentUser: FetchedResults<User>
@@ -60,6 +28,7 @@ struct ReminderRow: View {
                     showAlert = true
                 } else {
                     reminder.isCompleted.toggle()
+                    user.xp = max(0,user.xp - 5)
                     user.tasksCompleted = max(0, user.tasksCompleted - 1)
                 }
             } else { // complete task
@@ -155,13 +124,20 @@ struct ContentView: View {
 
                   // USer Tab
                   VStack {
-                    UserProfile(user: user)
+                    ProfileView(user: user)
                   }
                   .tabItem {
                       Image(systemName: "person.crop.circle")
                       Text("User")
                   }
 
+                  // daily calenges
+                  VStack {
+                      ChallengeView()
+                  }.tabItem {
+                      Image(systemName: "text.justify")
+                      Text("Challenges")
+                  }
               }
           }
           .onAppear {
