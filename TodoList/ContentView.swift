@@ -8,11 +8,9 @@
 import SwiftUI
 import CoreData
 
-
-
 struct ReminderRow: View {
     @FetchRequest(entity: User.entity(), sortDescriptors: [], animation: .default) var currentUser: FetchedResults<User>
-    @FetchRequest(entity: Challenge.entity(),sortDescriptors: [NSSortDescriptor(keyPath: \Challenge.startDate, ascending: true)]) var challenges: FetchedResults<Challenge>
+    @FetchRequest(entity: Challenge.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Challenge.startDate, ascending: true)]) var challenges: FetchedResults<Challenge>
     @Environment(\.managedObjectContext) var viewContext
     @ObservedObject var reminder: Reminder
     var activeTaskCount: Int
@@ -39,9 +37,9 @@ struct ReminderRow: View {
                     showAlert = true
                 } else {
                     reminder.isCompleted.toggle()
-                    user.xp = max(0,user.xp - 5)
+                    user.xp = max(0, user.xp - 5)
                     user.tasksCompleted = max(0, user.tasksCompleted - 1)
-                    
+
                 }
             } else { // complete task
                 reminder.isCompleted.toggle()
@@ -49,7 +47,7 @@ struct ReminderRow: View {
                 user.tasksCompleted += 1
                 user.xp += 5
             }
-            
+
             do {
                 try viewContext.save()
             } catch {
@@ -137,7 +135,7 @@ struct ContentView: View {
                           Image(systemName: "house.fill")
                           Text("List")
                       }
-                      
+
                       // Calendar tab
                       VStack {
                           CalendarView()
@@ -146,7 +144,7 @@ struct ContentView: View {
                           Image(systemName: "calendar")
                           Text("Calendar")
                       }
-                  
+
                       // daily challenges
                       VStack {
                           ChallengeView()
@@ -154,7 +152,7 @@ struct ContentView: View {
                           Image(systemName: "text.justify")
                           Text("Challenges")
                       }
-                      
+
                       // USer Tab
                       VStack {
                           ProfileView(user: user)

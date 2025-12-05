@@ -27,11 +27,11 @@ let weeklyTemplates = [
     ChallengeTemplate(title: "Complete 30 tasks this week", type: "weekly", goal: 30, rewardXP: 60)
 ]
 
-//MARK: ChallengeRow
-struct ChallengeRow: View{ //to make update in real time
+// MARK: ChallengeRow
+struct ChallengeRow: View { // to make update in real time
     @ObservedObject var challenge: Challenge
-    
-    var body: some View{
+
+    var body: some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(challenge.title ?? "No Title")
@@ -48,27 +48,26 @@ struct ChallengeRow: View{ //to make update in real time
     }
 }
 
-
 // MARK: ChallengeView
 struct ChallengeView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(entity: Challenge.entity(),sortDescriptors: [NSSortDescriptor(keyPath: \Challenge.startDate, ascending: true)]) var challenges: FetchedResults<Challenge>
-    @FetchRequest(entity: Reminder.entity(),sortDescriptors: []) var reminders: FetchedResults<Reminder>
-    @FetchRequest(entity: User.entity(),sortDescriptors: []) var currentUser: FetchedResults<User>
-    
-    var body: some View{
+    @FetchRequest(entity: Challenge.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Challenge.startDate, ascending: true)]) var challenges: FetchedResults<Challenge>
+    @FetchRequest(entity: Reminder.entity(), sortDescriptors: []) var reminders: FetchedResults<Reminder>
+    @FetchRequest(entity: User.entity(), sortDescriptors: []) var currentUser: FetchedResults<User>
+
+    var body: some View {
         List {
-            Section(header:Text("Daily Challenges")){
-                ForEach(challenges.filter{$0.type == "daily"}) { challenge in
+            Section(header: Text("Daily Challenges")) {
+                ForEach(challenges.filter {$0.type == "daily"}) { challenge in
                     ChallengeRow(challenge: challenge)
                 }
             }
-            Section(header:Text("Weekly Challenges")){
-                ForEach(challenges.filter{$0.type == "weekly"}) { challenge in
+            Section(header: Text("Weekly Challenges")) {
+                ForEach(challenges.filter {$0.type == "weekly"}) { challenge in
                     ChallengeRow(challenge: challenge)
                 }
             }
-            
+
         }
         .onAppear {
             deleteExpiredChallenges()
@@ -76,13 +75,13 @@ struct ChallengeView: View {
             updateChallengeProgress()
         }
     }
-    
+
     // MARK: - Generate Challenges
     private func generateChallengesIfNeeded() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date()))!
-        
+
         // Daily Challenges
         if !challenges.contains(where: { $0.type == "daily" && $0.startDate == today }) {
             for template in dailyTemplates {
@@ -96,7 +95,7 @@ struct ChallengeView: View {
                 challenge.goal = Int16(template.goal)
                 challenge.currentProgress = 0
                 challenge.rewardXP = Int64(template.rewardXP)
-                
+
                 try? viewContext.save()
             }
         }
@@ -118,49 +117,49 @@ struct ChallengeView: View {
 
         saveContext()
     }
-    
+
     // MARK: - Update Challenge Progress
-    private func updateChallengeProgress(){
+    private func updateChallengeProgress() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date()))!
-        for challenge in challenges{
+        for challenge in challenges {
             if challenge.isCompleted { continue }
-            
+
             let relevantTasks: Int
             switch challenge.type {
             case "daily":
-                if challenge.title == "Finish 2 medium task"{
-                    relevantTasks = reminders.filter{
+                if challenge.title == "Finish 2 medium task" {
+                    relevantTasks = reminders.filter {
                         $0.isCompleted && $0.priority == "Medium" && ($0.completedAt ?? Date()) >= today
                     }.count
-                }else { //generic case (just complete any)
-                    relevantTasks = reminders.filter{
+                } else { // generic case (just complete any)
+                    relevantTasks = reminders.filter {
                         $0.isCompleted && ($0.completedAt ?? Date()) >= today
                     }.count
                 }
             case "weekly":
-                if challenge.title == "Complete 20 medium tasks this week"{
-                    relevantTasks = reminders.filter{
+                if challenge.title == "Complete 20 medium tasks this week" {
+                    relevantTasks = reminders.filter {
                         $0.isCompleted && $0.priority == "Medium" && ($0.completedAt ?? Date()) >= weekStart
                     }.count
-                }else if challenge.title == "Finish 5 high priority tasks"{
-                    relevantTasks = reminders.filter{
+                } else if challenge.title == "Finish 5 high priority tasks" {
+                    relevantTasks = reminders.filter {
                         $0.isCompleted && $0.priority == "High" && ($0.completedAt ?? Date()) >= weekStart
                     }.count
-                }else {
-                    relevantTasks = reminders.filter{
+                } else {
+                    relevantTasks = reminders.filter {
                         $0.isCompleted && ($0.completedAt ?? Date()) >= weekStart
                     }.count
                 }
-                
+
             default:
                 relevantTasks = 0
             }
-            
+
             challenge.currentProgress = Int16(relevantTasks)
-            if challenge.currentProgress >= challenge.goal{
-                if challenge.currentProgress > challenge.goal{
+            if challenge.currentProgress >= challenge.goal {
+                if challenge.currentProgress > challenge.goal {
                     challenge.currentProgress = challenge.goal
                 }
                 challenge.isCompleted = true
@@ -168,32 +167,32 @@ struct ChallengeView: View {
             }
         }
     }
-    
-    //MARK: Update when past endDate
-    private func deleteExpiredChallenges(){
+
+    // MARK: Update when past endDate
+    private func deleteExpiredChallenges() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date()))!
-        
+
         // check if the date is after the endDate
-        for challenge in challenges{
-            switch challenge.type{
+        for challenge in challenges {
+            switch challenge.type {
             case "daily":
-                if let endDate = challenge.endDate, endDate < today{
+                if let endDate = challenge.endDate, endDate < today {
                     viewContext.delete(challenge)
                 }
             case "weekly":
-                if let endDate = challenge.endDate, endDate < weekStart{
+                if let endDate = challenge.endDate, endDate < weekStart {
                     viewContext.delete(challenge)
                 }
             default:
                 break
             }
-            
+
         }
         saveContext()
     }
-    
+
     // MARK: - Helpers
     private func saveContext() {
         do {
@@ -205,6 +204,6 @@ struct ChallengeView: View {
 
 }
 
-//#Preview {
+// #Preview {
 //    ChallengeView()
-//}
+// }
