@@ -8,6 +8,13 @@
 import SwiftUI
 import CoreData
 
+enum ReminderFilter: String, CaseIterable, Identifiable {
+    case all = "All Reminders"
+    case completed = "Finished"
+    case unfinished = "To do"
+    var id: Self { self }
+}
+
 struct ReminderRow: View {
     @FetchRequest(entity: User.entity(), sortDescriptors: [], animation: .default) var currentUser: FetchedResults<User>
     @FetchRequest(entity: Challenge.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Challenge.startDate, ascending: true)]) var challenges: FetchedResults<Challenge>
@@ -85,6 +92,19 @@ struct ContentView: View {
     var activeTaskCount: Int {reminders.filter { !$0.isCompleted }.count}
     var maxTasks: Int = 10
 
+    @State private var selectedFilter: ReminderFilter = .all
+
+    var filteredReminders: [Reminder] {
+        switch selectedFilter {
+        case .all:
+            return reminders.map { $0 }
+        case .completed:
+            return reminders.filter { $0.isCompleted }
+        case .unfinished:
+            return reminders.filter { !$0.isCompleted }
+        }
+    }
+
     var body: some View {
       VStack {
           TabView {
@@ -92,7 +112,7 @@ struct ContentView: View {
                       // List Tab
                       NavigationStack {
                           List {
-                              ForEach(reminders) { reminder in
+                              ForEach(filteredReminders) { reminder in
                                   ReminderRow(reminder: reminder, activeTaskCount: activeTaskCount)
                               }
                               .onDelete(perform: deleteReminders)
@@ -116,7 +136,20 @@ struct ContentView: View {
                                   }
                               }
                               ToolbarItem(placement: .topBarLeading) {
-                                  Button {
+                                  Menu {
+                                      ForEach(ReminderFilter.allCases) { filter in
+                                          Button {
+                                              selectedFilter = filter
+                                          } label: {
+                                              if selectedFilter == filter {
+                                                  Text(filter.rawValue)
+                                                  Image(systemName: "circle.circle.fill")
+                                              } else {
+                                                  Text(filter.rawValue)
+                                                  Image(systemName: "circle")
+                                              }
+                                          }
+                                      }
                                   } label: {
                                       Image(systemName: "line.3.horizontal.decrease")
                                   }
@@ -133,7 +166,7 @@ struct ContentView: View {
                       }
                       .tabItem {
                           Image(systemName: "house.fill")
-                          Text("List")
+                          Text("Home")
                       }
 
                       // Calendar tab
@@ -222,3 +255,4 @@ struct ContentView: View {
         .environment(\.managedObjectContext, context)
         .navigationTitle("Reminders")
 }
+
