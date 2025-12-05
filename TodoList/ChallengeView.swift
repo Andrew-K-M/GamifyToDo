@@ -17,7 +17,7 @@ struct ChallengeTemplate {
 
 let dailyTemplates = [
     ChallengeTemplate(title: "Complete 3 tasks today", type: "daily", goal: 3, rewardXP: 10),
-    ChallengeTemplate(title: "Finish 2 medium task", type: "daily", goal: 2, rewardXP: 15),
+    ChallengeTemplate(title: "Finish 2 medium tasks", type: "daily", goal: 2, rewardXP: 15),
     ChallengeTemplate(title: "Complete 5 tasks today", type: "daily", goal: 5, rewardXP: 20)
 ]
 
